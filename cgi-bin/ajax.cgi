@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use lib "/home/ireifej/book/JSON-2.59/lib";
+use lib "./JSON-2.59/lib";
 use JSON;
 
 use CGI qw(:standard);
