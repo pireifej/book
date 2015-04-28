@@ -1,3 +1,7 @@
+img {
+    padding-top: 20px;
+}
+
 .bb-bookblock {
 	width: 500px;
 	height: 700px;
@@ -212,4 +216,5 @@
 
 .caption {
     font-size: 200%;
+    padding: 10px 10px 10px 10px;
 }

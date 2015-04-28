@@ -54,4 +54,12 @@ $(document).ready(function() {
 		command_name : "test"
 	};
 	send_ajax_wrapper(ajax_data, "init_node_groups");
+
+    var password = "Ireifej2";
+    var encrypted = CryptoJS.AES.encrypt("Paul is Cool", password);
+    var decrypted = CryptoJS.AES.decrypt(encrypted, password);
+
+    if (decrypted.toString(CryptoJS.enc.Utf8) == "Paul is Cool") {
+        console.log("Unlocked!");
+    }
 });
