@@ -39,6 +39,11 @@ print header('application/json');
 
 if ($command_name eq 'test') {
 	my %test_info = ();
+    my $encrypt = get_param("encrypt_string");
+    my $filename = "/home/ireifej/report.txt";
+    open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
+    print $fh $encrypt;
+    close $fh;
 	$test_info{"hello"} = "world";
 	$json_text = to_json(\%test_info);
 	print $json_text;

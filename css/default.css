@@ -299,3 +299,19 @@ a img {
 p {
     padding-bottom: 1cm;
 }
+
+.left {
+    float: left;
+    align: left;
+    display: inline-block;
+    vertical-align: top;
+    color: black;
+    font-weight: bold;
+
+}
+
+.right {
+    float: right;
+    align: right;
+    display: inline-block;
+}

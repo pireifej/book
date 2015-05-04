@@ -1,5 +1,6 @@
 img {
-    padding-top: 20px;
+    margin-top: 20px;
+    box-shadow: 0 0 0 5px hsl(0, 0%, 80%), 0 0 0 15px hsl(0, 0%, 90%);
 }
 
 .bb-bookblock {

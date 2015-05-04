@@ -49,17 +49,50 @@ function init_node_groups(data) {
 	console.log(data);
 }
 
+$("#chapter1").click(function() {
+    $("#bb-bookblock").bookblock("jump", 1);
+});
+
+$("#chapter2").click(function() {
+    $("#bb-bookblock").bookblock("jump", 8);
+});
+
+$("#chapter3").click(function() {
+    $("#bb-bookblock").bookblock("jump", 13);
+});
+
+$("#chapter4").click(function() {
+    $("#bb-bookblock").bookblock("jump", 21);
+});
+
+$("#chapter5").click(function() {
+    $("#bb-bookblock").bookblock("jump", 28);
+});
+
+function load_image(dir, id, key) {
+	var private_key = openpgp.key.readArmored(key).keys[0];
+	private_key.decrypt('U2FsdGVkX1');
+
+	var my_dir = "images/" + dir + "/" + id + ".gpg";
+	$.get(my_dir, function(data) {
+		var gpg_msg = data;
+		gpg_msg = openpgp.message.readArmored(gpg_msg);
+		openpgp.decryptMessage(private_key, gpg_msg).then(function(plain_text) {
+		$("#" + id).attr("src", plain_text);
+			console.log("success");
+		}).catch(function(error) {
+			console.log("failure");
+		});
+	});
+}
+
 $(document).ready(function() {
-	var ajax_data = {
-		command_name : "test"
-	};
-	send_ajax_wrapper(ajax_data, "init_node_groups");
+	var key = $.ajax({
+				type: "GET",
+				url: "keys/private.gpg",
+				async: false
+			}).responseText;
 
-    var password = "Ireifej2";
-    var encrypted = CryptoJS.AES.encrypt("Paul is Cool", password);
-    var decrypted = CryptoJS.AES.decrypt(encrypted, password);
-
-    if (decrypted.toString(CryptoJS.enc.Utf8) == "Paul is Cool") {
-        console.log("Unlocked!");
-    }
+	load_image("intro", "116", key);
+	load_image("intro", "2", key);
 });
