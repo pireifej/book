@@ -1,7 +1,6 @@
 var img_count = $("img").length;
 var percentage = 0;
 var progress = 0;
-var password = "";
 var dialog;
 
 var Page = (function() {
@@ -167,7 +166,7 @@ function update_progress() {
 
 function load_image(dir, id, key) {
 	var private_key = openpgp.key.readArmored(key).keys[0];
-	private_key.decrypt(password);
+	private_key.decrypt($("#password").val());
 
 	var my_dir = "images/" + dir + "/" + id + ".gpg";
 	$.get(my_dir, function(data) {
@@ -177,13 +176,13 @@ function load_image(dir, id, key) {
 			$("#" + id).attr("src", plain_text);
 			//update_progress();
 		}).catch(function(error) {
+			alert("Decryption failed!");
 			console.log("failure");
 		});
 	});
 }
 
 function process_images() {
-    password = $("#password").val();
     dialog.dialog("close");
 
 	var songs = ["songs/01.mp3",
