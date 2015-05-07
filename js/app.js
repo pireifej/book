@@ -1,6 +1,8 @@
 var img_count = $("img").length;
 var percentage = 0;
 var progress = 0;
+var password = "";
+var dialog;
 
 var Page = (function() {
 	var config = {
@@ -165,7 +167,7 @@ function update_progress() {
 
 function load_image(dir, id, key) {
 	var private_key = openpgp.key.readArmored(key).keys[0];
-	private_key.decrypt('U2FsdGVkX1');
+	private_key.decrypt(password);
 
 	var my_dir = "images/" + dir + "/" + id + ".gpg";
 	$.get(my_dir, function(data) {
@@ -173,15 +175,16 @@ function load_image(dir, id, key) {
 		gpg_msg = openpgp.message.readArmored(gpg_msg);
 		openpgp.decryptMessage(private_key, gpg_msg).then(function(plain_text) {
 			$("#" + id).attr("src", plain_text);
-			update_progress();
+			//update_progress();
 		}).catch(function(error) {
 			console.log("failure");
 		});
 	});
 }
 
-$(document).ready(function() {
-	Page.init();
+function process_images() {
+    password = $("#password").val();
+    dialog.dialog("close");
 
 	var songs = ["songs/01.mp3",
                   "songs/02.mp3",
@@ -218,6 +221,7 @@ $(document).ready(function() {
 			}).responseText;
 
 	load_image("intro", "116", key);
+    /*
 	load_image("intro", "2", key);
 	load_image("intro", "3", key);
 	load_image("intro", "4", key);
@@ -282,7 +286,6 @@ $(document).ready(function() {
 	load_image("fun", "67", key);
 	load_image("fun", "32", key);
 	load_image("fun", "65", key);
-     
 	load_image("end", "113", key);
 	load_image("end", "72", key);
 	load_image("end", "37", key);
@@ -302,6 +305,20 @@ $(document).ready(function() {
 	load_image("end", "47", key);
 	load_image("end", "17", key);
 	load_image("end", "102", key);
-
+    */
 	//$("#progress").text("Done");
+}
+
+$(document).ready(function() {
+	Page.init();
+
+    dialog = $( "#dialog-form" ).dialog({
+		autoOpen: true,
+		height: 250,
+		width: 300,
+		modal: true,
+		buttons: {
+			"Start": process_images,
+		}
+	});
 });
