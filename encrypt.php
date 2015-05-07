@@ -1,6 +1,10 @@
 <?php
 $HOME = getenv('HOME');
-$dirs = array("multitasking", "sleeping", "eating", "birthdays", "fun", "intro" );
+if (empty($argv[1])) {
+	echo "Oops - please give me a list of directory names!\n";
+	exit;
+}
+$dirs = unserialize($argv[1]);
 foreach ($dirs as $dir) {
 	foreach (new DirectoryIterator("$HOME/book/images/$dir") as $file_info) {
 		if($file_info->isDot()) continue;
@@ -16,4 +20,5 @@ foreach ($dirs as $dir) {
 		echo "$new_file created.\n";
 	}
 }
+return 0;
 ?>
