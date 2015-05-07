@@ -221,7 +221,6 @@ function process_images() {
 			}).responseText;
 
 	load_image("intro", "116", key);
-    /*
 	load_image("intro", "2", key);
 	load_image("intro", "3", key);
 	load_image("intro", "4", key);
@@ -305,7 +304,6 @@ function process_images() {
 	load_image("end", "47", key);
 	load_image("end", "17", key);
 	load_image("end", "102", key);
-    */
 	//$("#progress").text("Done");
 }
 
