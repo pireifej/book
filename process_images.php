@@ -40,6 +40,12 @@ if ($command == "all" || $command == "encrypt") {
 	echo $result;
 }
 
+if ($command == "all" || $command == "cat") {
+	echo "Concatenating...\n";
+	$result = shell_exec("php " . $HOME . "/book/concatenate.php " . escapeshellarg(serialize($dirs)));
+	echo $result;
+}
+
 if ($command == "all" || $command == "clean") {
 	echo "Cleaning...\n";
 	foreach ($dirs as $dir) {

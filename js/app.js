@@ -164,21 +164,22 @@ function update_progress() {
 	$("#progress").text(percentage + "%");
 }
 
-function load_image(dir, id, key) {
+function load_image(key) {
 	var private_key = openpgp.key.readArmored(key).keys[0];
 	private_key.decrypt($("#password").val());
-
-	var my_dir = "images/" + dir + "/" + id + ".gpg";
-	$.get(my_dir, function(data) {
-		var gpg_msg = data;
-		gpg_msg = openpgp.message.readArmored(gpg_msg);
-		openpgp.decryptMessage(private_key, gpg_msg).then(function(plain_text) {
-			$("#" + id).attr("src", plain_text);
-			//update_progress();
-		}).catch(function(error) {
-			alert("Decryption failed!");
-			console.log("failure");
-		});
+	var my_dir = "images/data";
+	$.getJSON(my_dir, function(data) {
+		for (var key in data) {
+			var gpg_msg = data[key];
+			gpg_msg = gpg_msg.join("\n");
+			gpg_msg = openpgp.message.readArmored(gpg_msg);
+			openpgp.decryptMessage(private_key, gpg_msg).then(function(key, plain_text) {
+				$("#" + key).attr("src", plain_text);
+			}.bind(null, key)).catch(function(error) {
+				alert("Decryption failed!");
+				console.log("failure");
+			});
+		}
 	});
 }
 
@@ -219,90 +220,7 @@ function process_images() {
 				async: false
 			}).responseText;
 
-	load_image("intro", "116", key);
-	load_image("intro", "2", key);
-	load_image("intro", "3", key);
-	load_image("intro", "4", key);
-	load_image("intro", "5", key);
-	load_image("intro", "6", key);
-	load_image("intro", "83", key);
-	load_image("multitasking", "9", key);
-	load_image("multitasking", "11", key);
-	load_image("multitasking", "51", key);
-	load_image("multitasking", "56", key);
-	load_image("multitasking", "57", key);
-	load_image("multitasking", "115", key);
-	load_image("multitasking", "115", key);
-	load_image("eating", "28", key);
-	load_image("eating", "34", key);
-	load_image("eating", "68", key);
-	load_image("eating", "106", key);
-	load_image("eating", "50", key);
-	load_image("eating", "118", key);
-	load_image("eating", "124", key);
-	load_image("eating", "128", key);
-	load_image("eating", "33", key);
-	load_image("eating", "75", key);
-	load_image("eating", "76", key);
-	load_image("sleeping", "131", key);
-	load_image("sleeping", "15", key);
-	load_image("sleeping", "12", key);
-	load_image("sleeping", "139", key);
-	load_image("sleeping", "120", key);
-	load_image("sleeping", "84", key);
-	load_image("sleeping", "14", key);
-	load_image("sleeping", "140", key);
-	load_image("birthdays", "111", key);
-	load_image("birthdays", "22", key);
-	load_image("birthdays", "25", key);
-	load_image("birthdays", "27", key);
-	load_image("birthdays", "110", key);
-	load_image("birthdays", "135", key);
-	load_image("birthdays", "136", key);
-	load_image("fun", "114", key);
-	load_image("fun", "133", key);
-	load_image("fun", "24", key);
-	load_image("fun", "82", key);
-	load_image("fun", "40", key);
-	load_image("fun", "48", key);
-	load_image("fun", "55", key);
-	load_image("fun", "35", key);
-	load_image("fun", "38", key);
-	load_image("fun", "63", key);
-	load_image("fun", "92", key);
-	load_image("fun", "94", key);
-	load_image("fun", "95", key);
-	load_image("fun", "93", key);
-	load_image("fun", "104", key);
-	load_image("fun", "100", key);
-	load_image("fun", "129", key);
-	load_image("fun", "123", key);
-	load_image("fun", "127", key);
-	load_image("fun", "101", key);
-	load_image("fun", "90", key);
-	load_image("fun", "77", key);
-	load_image("fun", "67", key);
-	load_image("fun", "32", key);
-	load_image("fun", "65", key);
-	load_image("end", "113", key);
-	load_image("end", "72", key);
-	load_image("end", "37", key);
-	load_image("end", "130", key);
-	load_image("end", "112", key);
-	load_image("end", "89", key);
-	load_image("end", "125", key);
-	load_image("end", "10", key);
-	load_image("end", "71", key);
-	load_image("end", "119", key);
-	load_image("end", "108", key);
-	load_image("end", "7", key);
-	load_image("end", "73", key);
-	load_image("end", "98", key);
-	load_image("end", "poem1", key);
-	load_image("end", "poem2", key);
-	load_image("end", "47", key);
-	load_image("end", "17", key);
-	load_image("end", "102", key);
+	load_image(key);
 	//$("#progress").text("Done");
 }
 
