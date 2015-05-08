@@ -202,6 +202,7 @@ function load_image(key) {
 			gpg_msg = gpg_msg.join("\n");
 			gpg_msg = openpgp.message.readArmored(gpg_msg);
 			openpgp.decryptMessage(private_key, gpg_msg).then(function(key, plain_text) {
+                    alert(key);
 				$("#" + key).attr("src", plain_text);
 			}.bind(null, key)).catch(function(error) {
 				alert("Decryption failed!");
