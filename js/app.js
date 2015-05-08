@@ -168,19 +168,53 @@ function load_image(key) {
 	var private_key = openpgp.key.readArmored(key).keys[0];
 	private_key.decrypt($("#password").val());
 	var my_dir = "images/data";
-	$.getJSON(my_dir, function(data) {
+	var ireifej = "";
+	ireifej += $.ajax({
+			type: "GET",
+               url: "images/xaa",
+			async: false
+		}).responseText;
+     alert("xaa");
+	ireifej += $.ajax({
+			type: "GET",
+               url: "images/xab",
+			async: false
+		}).responseText;
+     alert("xab");
+	ireifej += $.ajax({
+			type: "GET",
+               url: "images/xac",
+			async: false
+		}).responseText;
+     alert("xac");
+	ireifej += $.ajax({
+			type: "GET",
+               url: "images/xad",
+			async: false
+		}).responseText;
+     alert("xad");
+	ireifej += $.ajax({
+			type: "GET",
+               url: "images/xae",
+			async: false
+		}).responseText;
+     alert("xae");
+ 
+	//$.getJSON(my_dir, function(data) {
+	var data = JSON.parse(ireifej);
 		for (var key in data) {
 			var gpg_msg = data[key];
 			gpg_msg = gpg_msg.join("\n");
 			gpg_msg = openpgp.message.readArmored(gpg_msg);
 			openpgp.decryptMessage(private_key, gpg_msg).then(function(key, plain_text) {
+                       alert("Decrypt " + key);
 				$("#" + key).attr("src", plain_text);
 			}.bind(null, key)).catch(function(error) {
 				alert("Decryption failed!");
 				console.log("failure");
 			});
 		}
-	});
+          //});
 }
 
 function process_images() {

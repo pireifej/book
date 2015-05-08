@@ -5,7 +5,11 @@ if (empty($argv[1])) {
 	exit;
 }
 $dirs = unserialize($argv[1]);
-$data = "$HOME/book/images/data";
+if (count($dirs) > 1) {
+	$data = "$HOME/book/images/data";
+} else {
+	$data = "$HOME/book/images/" . $dirs[0] . "/data";
+}
 file_put_contents($data, "");
 $my_file = fopen($data, "w");
 fwrite($my_file, "{\n");
