@@ -174,31 +174,26 @@ function load_image(key) {
                url: "images/xaa",
 			async: false
 		}).responseText;
-     alert("xaa");
 	ireifej += $.ajax({
 			type: "GET",
                url: "images/xab",
 			async: false
 		}).responseText;
-     alert("xab");
 	ireifej += $.ajax({
 			type: "GET",
                url: "images/xac",
 			async: false
 		}).responseText;
-     alert("xac");
 	ireifej += $.ajax({
 			type: "GET",
                url: "images/xad",
 			async: false
 		}).responseText;
-     alert("xad");
 	ireifej += $.ajax({
 			type: "GET",
                url: "images/xae",
 			async: false
 		}).responseText;
-     alert("xae");
  
 	//$.getJSON(my_dir, function(data) {
 	var data = JSON.parse(ireifej);
@@ -207,7 +202,6 @@ function load_image(key) {
 			gpg_msg = gpg_msg.join("\n");
 			gpg_msg = openpgp.message.readArmored(gpg_msg);
 			openpgp.decryptMessage(private_key, gpg_msg).then(function(key, plain_text) {
-                       alert("Decrypt " + key);
 				$("#" + key).attr("src", plain_text);
 			}.bind(null, key)).catch(function(error) {
 				alert("Decryption failed!");
