@@ -455,6 +455,9 @@
 		isActive: function() {
 			return this.isAnimating;
 		},
+		curr : function() {
+			alert(this.current);
+		},
 		// public method: dynamically adds new elements
 		// call this method after inserting new "bb-item" elements inside the BookBlock
 		update : function () {

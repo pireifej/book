@@ -1,9 +1,38 @@
-var img_count = $("img").length;
-var percentage = 0;
-var progress = 0;
-var dialog;
+var key;
+var private_key;
+var chapters = {
+	"1" : {
+		"loaded": false,
+		"title": "intro"
+	},
+	"8" : {
+		"loaded": false,
+		"title": "multitasking"
+	},
+	"13" : {
+		"loaded": false,
+		"title": "eating"
+	},
+	"21" : {
+		"loaded": false,
+		"title":"sleeping"
+	},
+	"28" : {
+		"loaded": false,
+		"title": "birthdays"
+	},
+	"33" : {
+		"loaded": false,
+		"title": "fun"
+	},
+	"55" : {
+		"loaded": false,
+		"title": "end"
+	}
+};
 
 var Page = (function() {
+	var curr = 1;
 	var config = {
 		$bookBlock: $("#bb-bookblock"),
 		$navNext: $("#bb-nav-next"),
@@ -25,21 +54,29 @@ var Page = (function() {
 		// add navigation events
 		config.$navNext.on( 'click touchstart', function() {
 			config.$bookBlock.bookblock( 'next' );
+			curr++;
+			load_chapter(curr);
 			return false;
 		});
 
 		config.$navPrev.on( 'click touchstart', function() {
 			config.$bookBlock.bookblock( 'prev' );
+			curr--;
+			load_chapter(curr);
 			return false;
 		});
 
 		config.$navFirst.on( 'click touchstart', function() {
 			config.$bookBlock.bookblock( 'first' );
+			curr = 1;
+			load_chapter(curr);
 			return false;
 		});
 
 		config.$navLast.on( 'click touchstart', function() {
 			config.$bookBlock.bookblock( 'last' );
+			curr = $(".bb-item").length;
+			load_chapter(curr);
 			return false;
 		});
 						
@@ -47,10 +84,14 @@ var Page = (function() {
 		$slides.on( {
 			'swipeleft' : function( event ) {
 				config.$bookBlock.bookblock( 'next' );
+				curr++;
+				load_chapter(curr);
 				return false;
 			},
 			'swiperight' : function( event ) {
 				config.$bookBlock.bookblock( 'prev' );
+				curr--;
+				load_chapter(curr);
 				return false;
 			}
 		});
@@ -68,9 +109,13 @@ var Page = (function() {
 			switch (keyCode) {
 				case arrow.left:
 					config.$bookBlock.bookblock( 'prev' );
+					curr--;
+					load_chapter(curr);
 					break;
 				case arrow.right:
 					config.$bookBlock.bookblock( 'next' );
+					curr++;
+					load_chapter(curr);
 					break;
 			}
 		});
@@ -130,89 +175,80 @@ function init_node_groups(data) {
 }
 
 $("#chapter1").click(function() {
+	load_chapter(1);
 	$("#bb-bookblock").bookblock("jump", 1);
 });
 
 $("#chapter2").click(function() {
+	load_chapter(8);
 	$("#bb-bookblock").bookblock("jump", 8);
 });
 
 $("#chapter3").click(function() {
+	load_chapter(13);
 	$("#bb-bookblock").bookblock("jump", 13);
 });
 
 $("#chapter4").click(function() {
+	load_chapter(21);
 	$("#bb-bookblock").bookblock("jump", 21);
 });
 
 $("#chapter5").click(function() {
+	load_chapter(28);
 	$("#bb-bookblock").bookblock("jump", 28);
 });
 
 $("#chapter6").click(function() {
+	load_chapter(33);
 	$("#bb-bookblock").bookblock("jump", 33);
 });
 
 $("#chapter7").click(function() {
+	load_chapter(55);
 	$("#bb-bookblock").bookblock("jump", 55);
 });
 
-function update_progress() {
-	progress++;
-	percentage = (progress / img_count) * 100;
-	console.log(percentage);
-	$("#progress").text(percentage + "%");
+function load_chapter(page_nbr) {
+	if (chapters[page_nbr] === undefined) return;
+	var dir = chapters[page_nbr];
+	if (dir.loaded) return;
+	load_image(key, private_key, dir.title);
+	dir.loaded = true;
 }
 
-function load_image(key) {
-	var private_key = openpgp.key.readArmored(key).keys[0];
-	private_key.decrypt($("#password").val());
-	var my_dir = "images/data";
-	var ireifej = "";
-	ireifej += $.ajax({
+function load_image(key, private_key, dir) {
+	var gpg_msg = $.ajax({
 			type: "GET",
-               url: "images/xaa",
+			url: "images/data." + dir + ".gpg",
 			async: false
 		}).responseText;
-	ireifej += $.ajax({
-			type: "GET",
-               url: "images/xab",
-			async: false
-		}).responseText;
-	ireifej += $.ajax({
-			type: "GET",
-               url: "images/xac",
-			async: false
-		}).responseText;
-	ireifej += $.ajax({
-			type: "GET",
-               url: "images/xad",
-			async: false
-		}).responseText;
-	ireifej += $.ajax({
-			type: "GET",
-               url: "images/xae",
-			async: false
-		}).responseText;
- 
-	//$.getJSON(my_dir, function(data) {
-	var data = JSON.parse(ireifej);
+
+	gpg_msg = openpgp.message.readArmored(gpg_msg);
+	openpgp.decryptMessage(private_key, gpg_msg).then(function(plain_text) {
+		var data = JSON.parse(plain_text);
 		for (var key in data) {
-			var gpg_msg = data[key];
-			gpg_msg = gpg_msg.join("\n");
-			gpg_msg = openpgp.message.readArmored(gpg_msg);
-			openpgp.decryptMessage(private_key, gpg_msg).then(function(key, plain_text) {
-				$("#" + key).attr("src", plain_text);
-			}.bind(null, key)).catch(function(error) {
-				alert("Decryption failed!");
-				console.log("failure");
-			});
+            console.log(key);
+			var img_data = data[key];
+			$("#" + key).attr("src", img_data);
 		}
-          //});
+	}).catch(function(error) {
+			alert("Decryption failed!");
+			console.log("failure");
+	})
 }
 
 function process_images() {
     dialog.dialog("close");
+
+	key = $.ajax({
+			type: "GET",
+			url: "keys/private.gpg",
+			async: false
+	}).responseText;
+
+	private_key = openpgp.key.readArmored(key).keys[0];
+	private_key.decrypt($("#password").val());
 
 	var songs = ["songs/01.mp3",
                   "songs/02.mp3",
@@ -242,19 +278,11 @@ function process_images() {
 		i++;
 	});
 
-	var key = $.ajax({
-				type: "GET",
-				url: "keys/private.gpg",
-				async: false
-			}).responseText;
-
-	load_image(key);
-	//$("#progress").text("Done");
+	load_image(key, private_key, "intro");
 }
 
 $(document).ready(function() {
 	Page.init();
-
     dialog = $( "#dialog-form" ).dialog({
 		autoOpen: true,
 		height: 250,
