@@ -1,35 +1,6 @@
 var key;
 var private_key;
-var chapters = {
-	"1" : {
-		"loaded": false,
-		"title": "intro"
-	},
-	"8" : {
-		"loaded": false,
-		"title": "multitasking"
-	},
-	"13" : {
-		"loaded": false,
-		"title": "eating"
-	},
-	"21" : {
-		"loaded": false,
-		"title":"sleeping"
-	},
-	"28" : {
-		"loaded": false,
-		"title": "birthdays"
-	},
-	"33" : {
-		"loaded": false,
-		"title": "fun"
-	},
-	"55" : {
-		"loaded": false,
-		"title": "end"
-	}
-};
+var pages = {}
 
 var Page = (function() {
 	var curr = 1;
@@ -53,45 +24,41 @@ var Page = (function() {
 
 		// add navigation events
 		config.$navNext.on( 'click touchstart', function() {
-			config.$bookBlock.bookblock( 'next' );
 			curr++;
-			load_chapter(curr);
+			load_chapter(curr + 1);
+			config.$bookBlock.bookblock( 'next' );
 			return false;
 		});
 
 		config.$navPrev.on( 'click touchstart', function() {
-			config.$bookBlock.bookblock( 'prev' );
 			curr--;
-			load_chapter(curr);
+			config.$bookBlock.bookblock( 'prev' );
 			return false;
 		});
 
 		config.$navFirst.on( 'click touchstart', function() {
-			config.$bookBlock.bookblock( 'first' );
 			curr = 1;
-			load_chapter(curr);
+			config.$bookBlock.bookblock( 'first' );
 			return false;
 		});
 
 		config.$navLast.on( 'click touchstart', function() {
-			config.$bookBlock.bookblock( 'last' );
 			curr = $(".bb-item").length;
-			load_chapter(curr);
+			config.$bookBlock.bookblock( 'last' );
 			return false;
 		});
 						
 		// add swipe events
 		$slides.on( {
 			'swipeleft' : function( event ) {
-				config.$bookBlock.bookblock( 'next' );
 				curr++;
-				load_chapter(curr);
+				load_chapter(curr + 1);
+				config.$bookBlock.bookblock( 'next' );
 				return false;
 			},
 			'swiperight' : function( event ) {
-				config.$bookBlock.bookblock( 'prev' );
 				curr--;
-				load_chapter(curr);
+				config.$bookBlock.bookblock( 'prev' );
 				return false;
 			}
 		});
@@ -108,14 +75,13 @@ var Page = (function() {
 
 			switch (keyCode) {
 				case arrow.left:
-					config.$bookBlock.bookblock( 'prev' );
 					curr--;
-					load_chapter(curr);
+					config.$bookBlock.bookblock( 'prev' );
 					break;
 				case arrow.right:
-					config.$bookBlock.bookblock( 'next' );
 					curr++;
-					load_chapter(curr);
+					load_chapter(curr + 1);
+					config.$bookBlock.bookblock( 'next' );
 					break;
 			}
 		});
@@ -169,11 +135,6 @@ function send_ajax(ajax_data) {
 		});
 }
 
-function init_node_groups(data) {
-	console.log("All done!");
-	console.log(data);
-}
-
 $("#chapter1").click(function() {
 	load_chapter(1);
 	$("#bb-bookblock").bookblock("jump", 1);
@@ -210,31 +171,28 @@ $("#chapter7").click(function() {
 });
 
 function load_chapter(page_nbr) {
-	if (chapters[page_nbr] === undefined) return;
-	var dir = chapters[page_nbr];
-	if (dir.loaded) return;
-	load_image(key, private_key, dir.title);
-	dir.loaded = true;
+	if (pages[page_nbr] === undefined) return;
+	var page = pages[page_nbr];
+	if (page.loaded) return;
+	for (var id = 0; id < page.id.length; id++) {
+		load_image(key, private_key, "", page.id[id]);
+     }
+	page.loaded = true;
 }
 
-function load_image(key, private_key, dir) {
+function load_image(key, private_key, dir, id) {
 	var gpg_msg = $.ajax({
 			type: "GET",
-			url: "images/data." + dir + ".gpg",
+			url: "images/" + id + ".gpg",
 			async: false
 		}).responseText;
 
 	gpg_msg = openpgp.message.readArmored(gpg_msg);
 	openpgp.decryptMessage(private_key, gpg_msg).then(function(plain_text) {
-		var data = JSON.parse(plain_text);
-		for (var key in data) {
-            console.log(key);
-			var img_data = data[key];
-			$("#" + key).attr("src", img_data);
-		}
+		$("#" + id).attr("src", plain_text);
 	}).catch(function(error) {
-			alert("Decryption failed!");
-			console.log("failure");
+		alert("Decryption failed!");
+		console.log("failure");
 	})
 }
 
@@ -267,6 +225,7 @@ function process_images() {
 	];
 	var i = 1;
 	var audio = $("#music");
+	audio.attr("autoplay", true);
 	audio.attr("src", "songs/01.mp3");
 	audio.on("ended", function() {
 		// reset play list
@@ -278,12 +237,30 @@ function process_images() {
 		i++;
 	});
 
-	load_image(key, private_key, "intro");
+	load_image(key, private_key, "intro", pages[1].id);
+	load_image(key, private_key, "intro", pages[2].id);
 }
 
 $(document).ready(function() {
 	Page.init();
-    dialog = $( "#dialog-form" ).dialog({
+
+	var page = 1;
+	$(".bb-item", this).each(function(index, element) {
+		var children = $(element).children("img");
+		if (children.length > 1) {
+			var ids = [];
+			for (var i = 0; i < children.length; i++) {
+				ids.push($(children[i]).attr("id"));
+			}
+			pages[page] = {"id": ids, "loaded": false};
+		} else {
+			var id = $(element).children("img").attr("id");
+			pages[page] = {"id": [id], "loaded": false};
+		}
+		page++;
+	});
+
+	dialog = $( "#dialog-form" ).dialog({
 		autoOpen: true,
 		height: 250,
 		width: 300,
